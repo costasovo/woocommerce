@@ -37,6 +37,9 @@ jobs:
           # Create working directory for mirrors
           mkdir -p mirror-working-dir
           
+          # Ensure proper permissions for the working directory
+          chmod 755 mirror-working-dir
+          
           # Create mirrors.txt file with target repository
           echo "costasovo/${{ github.event.inputs.package }}" > mirror-working-dir/mirrors.txt
           
