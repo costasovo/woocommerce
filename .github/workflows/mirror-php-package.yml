@@ -1,0 +1,60 @@
+name: Mirror PHP package
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Enter package name to mirror (e.g. email-editor). It must refer to a package in the packages/php directory.'
+        required: true
+
+permissions: { }
+
+jobs:
+  mirror:
+    name: Run packages release script
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Create directories
+        run: |
+          mkdir -p monorepo
+
+      - name: Checkout monorepo
+        uses: actions/checkout@v4
+        with:
+          path: monorepo
+
+      - name: Check if package exists
+        id: check-package
+        run: |
+          if [ ! -d "monorepo/packages/php/${{ github.event.inputs.package }}" ]; then
+            echo "Package ${{ github.event.inputs.package }} does not exist in packages/php"
+            exit 1
+          fi
+
+      - name: Setup mirror directory structure
+        run: |
+          # Create working directory for mirrors
+          mkdir -p mirror-working-dir
+          
+          # Create mirrors.txt file with target repository
+          echo "costasovo/${{ github.event.inputs.package }}" > mirror-working-dir/mirrors.txt
+          
+          # Create subdirectory for the mirror repository
+          mkdir -p "mirror-working-dir/costasovo/${{ github.event.inputs.package }}"
+          
+          # Copy package content to mirror directory
+          cp -r "monorepo/packages/php/${{ github.event.inputs.package }}"/* "mirror-working-dir/costasovo/${{ github.event.inputs.package }}/"
+          
+          # Copy any hidden files
+          cp -r "monorepo/packages/php/${{ github.event.inputs.package }}/".* "mirror-working-dir/costasovo/${{ github.event.inputs.package }}/" 2>/dev/null || true
+
+      - name: Push to mirror
+        uses: Automattic/action-push-to-mirrors@v1
+        with:
+          source-directory: ${{ github.workspace }}/monorepo
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+          username: costasovo
+          working-directory: mirror-working-dir
+          commit-message: "Mirror package ${{ github.event.inputs.package }} from WooCommerce"
+        timeout-minutes: 5
