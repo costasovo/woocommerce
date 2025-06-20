@@ -15,19 +15,13 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Create directories
-        run: |
-          mkdir -p monorepo
-
       - name: Checkout monorepo
         uses: actions/checkout@v4
-        with:
-          path: monorepo
 
       - name: Check if package exists
         id: check-package
         run: |
-          if [ ! -d "monorepo/packages/php/${{ github.event.inputs.package }}" ]; then
+          if [ ! -d "packages/php/${{ github.event.inputs.package }}" ]; then
             echo "Package ${{ github.event.inputs.package }} does not exist in packages/php"
             exit 1
           fi
@@ -42,15 +36,16 @@ jobs:
           
           # Create mirrors.txt file with target repository
           echo "costasovo/${{ github.event.inputs.package }}" > mirror-working-dir/mirrors.txt
+          cat mirror-working-dir/mirrors.txt
           
           # Create subdirectory for the mirror repository
           mkdir -p "mirror-working-dir/costasovo/${{ github.event.inputs.package }}"
           
           # Copy package content to mirror directory
-          cp -r "monorepo/packages/php/${{ github.event.inputs.package }}"/* "mirror-working-dir/costasovo/${{ github.event.inputs.package }}/"
+          cp -r "packages/php/${{ github.event.inputs.package }}"/* "mirror-working-dir/costasovo/${{ github.event.inputs.package }}/"
           
           # Copy any hidden files
-          cp -r "monorepo/packages/php/${{ github.event.inputs.package }}/".* "mirror-working-dir/costasovo/${{ github.event.inputs.package }}/" 2>/dev/null || true
+          cp -r "packages/php/${{ github.event.inputs.package }}/".* "mirror-working-dir/costasovo/${{ github.event.inputs.package }}/" 2>/dev/null || true
       
       - name: Check if cleanup script exists
         id: check-cleanup-script
@@ -70,7 +65,6 @@ jobs:
       - name: Push to mirror
         uses: Automattic/action-push-to-mirrors@v2.2.2
         with:
-          source-directory: ${{ github.workspace }}/monorepo
           token: ${{ secrets.API_TOKEN_GITHUB }}
           username: costasovo
           working-directory: mirror-working-dir
