@@ -48,7 +48,22 @@ jobs:
           
           # Copy any hidden files
           cp -r "monorepo/packages/php/${{ github.event.inputs.package }}/".* "mirror-working-dir/costasovo/${{ github.event.inputs.package }}/" 2>/dev/null || true
-
+      
+      - name: Check if cleanup script exists
+        id: check-cleanup-script
+        run: |
+          if [ -f "./packages/php/${{ github.event.inputs.package }}/tasks/mirror_cleanup.sh" ]; then
+            echo "cleanup_script_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "cleanup_script_exists=false" >> $GITHUB_OUTPUT
+          fi
+  
+      - name: Cleanup mirror directory
+        if: steps.check-cleanup-script.outputs.cleanup_script_exists == 'true'
+        run: |
+          chmod +x "./packages/php/${{ github.event.inputs.package }}/tasks/mirror_cleanup.sh"
+          ./packages/php/${{ github.event.inputs.package }}/tasks/mirror_cleanup.sh "mirror-working-dir/costasovo/${{ github.event.inputs.package }}"
+  
       - name: Push to mirror
         uses: Automattic/action-push-to-mirrors@v2.2.2
         with:
