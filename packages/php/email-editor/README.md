@@ -1,5 +1,7 @@
 # WooCommerce Email Editor
 
+XXXX
+
 This folder contains the code for the WooCommerce Email Editor PHP Package.
 We aim to extract the engine as an independent library, so it can be used in other projects.
 As we are still in an exploration phase, we keep it together with the WooCommerce codebase.
