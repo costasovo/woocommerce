@@ -36,7 +36,7 @@ jobs:
           
           # Create mirrors.txt file with target repository
           echo "costasovo/${{ github.event.inputs.package }}" > mirror-working-dir/mirrors.txt
-          cat mirror-working-dir/mirrors.txt
+          touch mirror-working-dir/changes.diff
           
           # Create subdirectory for the mirror repository
           mkdir -p "mirror-working-dir/costasovo/${{ github.event.inputs.package }}"
