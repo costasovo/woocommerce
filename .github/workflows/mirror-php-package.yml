@@ -46,7 +46,8 @@ jobs:
           
           # Copy any hidden files
           cp -r "packages/php/${{ github.event.inputs.package }}/".* "mirror-working-dir/costasovo/${{ github.event.inputs.package }}/" 2>/dev/null || true
-      
+          ls -la mirror-working-dir
+          
       - name: Check if cleanup script exists
         id: check-cleanup-script
         run: |
@@ -67,6 +68,6 @@ jobs:
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           username: costasovo
-          working-directory: mirror-working-dir
+          working-directory: ${{ github.workspace }}/mirror-working-dir
           commit-message: "Mirror package ${{ github.event.inputs.package }} from WooCommerce"
         timeout-minutes: 5
