@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script to clean up specified files and directories from a given path
-# Usage: ./mirror_cleanup.sh <directory_path>
+# This script is used to prepare a directory for mirroring for publishing the package.
+# Usage: ./mirror_prepare.sh <directory_path>
 
 # Check if a directory path was provided
 if [ $# -eq 0 ]; then
