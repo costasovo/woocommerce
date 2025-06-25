@@ -1,3 +1,4 @@
+
 name: Mirror PHP package for release
 on:
     workflow_dispatch:
@@ -27,7 +28,6 @@ jobs:
 
             - name: Grab package build directory
               run: echo "mirror_dir=$( pnpm --filter \"${{ github.event.inputs.package }}\" list --json | jq --compact-output '.[]' | jq --raw-output '( .path + \"/build\")' )" >> "$GITHUB_ENV"
-
 
             - name: Push to mirror
               uses: Automattic/action-push-to-mirrors@v2.2.2
