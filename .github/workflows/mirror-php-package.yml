@@ -19,6 +19,9 @@ jobs:
             - name: Checkout monorepo
               uses: actions/checkout@v4
 
+            - name: Setup WooCommerce Monorepo
+              uses: ./.github/actions/setup-woocommerce-monorepo
+            
             - name: Build package for mirroring
               run: |
                   pnpm --filter "@woocommerce/${{ github.event.inputs.package }}" build:composer-package
