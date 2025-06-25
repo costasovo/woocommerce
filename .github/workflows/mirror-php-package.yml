@@ -1,5 +1,5 @@
-name: Mirror PHP package
-description: 'Mirrors a PHP package to a mirror repository to be released to Packagist.org.'
+
+name: Mirror PHP package for release
 on:
     workflow_dispatch:
         inputs:
@@ -27,7 +27,7 @@ jobs:
                   pnpm --filter "${{ github.event.inputs.package }}" build:composer-package
 
             - name: Grab package build directory
-              run: echo "mirror_dir=$( pnpm --filter ${{ github.event.inputs.package }} list --json | jq --compact-output '.[]' | jq --raw-output '( .path + "/build")' )" >> $GITHUB_ENV
+              run: echo "mirror_dir=$( pnpm --filter \"${{ github.event.inputs.package }}\" list --json | jq --compact-output '.[]' | jq --raw-output '( .path + \"/build\")' )" >> "$GITHUB_ENV"
 
             - name: Push to mirror
               uses: Automattic/action-push-to-mirrors@v2.2.2
