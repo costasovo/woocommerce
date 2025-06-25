@@ -33,10 +33,13 @@ rsync -av \
     --include='composer.json' \
     --include='composer.lock' \
     --include='changelog.md' \
-    --include='README.md' \
     --exclude='*' \
     "$PACKAGE_DIR/" \
     "$BUILD_DIR/woocommerce/email-editor/"
+
+# Copy mirror-readme.md as README.md
+echo "📝 Copying mirror-readme.md as README.md..."
+cp "$PACKAGE_DIR/tasks/mirror-readme.md" "$BUILD_DIR/woocommerce/email-editor/README.md"
 
 echo "✅ Build completed successfully!"
 
