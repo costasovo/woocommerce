@@ -1,9 +1,9 @@
-name: Mirror PHP package
+name: Mirror PHP package for release
 on:
     workflow_dispatch:
         inputs:
             package:
-                description: 'Enter package name to mirror (e.g. email-editor). It must refer to a package in the packages/php directory.'
+                description: 'Enter package name to mirror (e.g. @woocommerce/email-editor-config}). It must refer to a name defined in the package.json file of the package in the packages/php directory.'
                 required: true
 
 permissions: {}
@@ -18,51 +18,22 @@ jobs:
             - name: Checkout monorepo
               uses: actions/checkout@v4
 
-            - name: Check if package exists
-              id: check-package
+            - name: Setup WooCommerce Monorepo
+              uses: ./.github/actions/setup-woocommerce-monorepo
+            
+            - name: Build package for mirroring
               run: |
-                  if [ ! -d "packages/php/${{ github.event.inputs.package }}" ]; then
-                    echo "Package ${{ github.event.inputs.package }} does not exist in packages/php"
-                    exit 1
-                  fi
+                  pnpm --filter "${{ github.event.inputs.package }}" build:composer-package
 
-            - name: Setup mirror directory structure
-              run: |
-                  # Create working directory for mirrors
-                  mkdir -p mirror-working-dir
+            - name: Grab package build directory
+              run: echo "mirror_dir=$( pnpm --filter \"${{ github.event.inputs.package }}\" list --json | jq --compact-output '.[]' | jq --raw-output '( .path + \"/build\")' )" >> "$GITHUB_ENV"
 
-                  # Create mirrors.txt file with target repository
-                  echo "woocommerce/${{ github.event.inputs.package }}" > mirror-working-dir/mirrors.txt
-
-                  # Create subdirectory for the mirror repository
-                  mkdir -p "mirror-working-dir/woocommerce/${{ github.event.inputs.package }}"
-
-                  # Copy package content to mirror directory
-                  cp -r "packages/php/${{ github.event.inputs.package }}"/* "mirror-working-dir/woocommerce/${{ github.event.inputs.package }}/"
-
-                  # Copy any hidden files
-                  cp -r "packages/php/${{ github.event.inputs.package }}/".* "mirror-working-dir/woocommerce/${{ github.event.inputs.package }}/" 2>/dev/null || true
-
-            - name: Check if mirror prepare script exists
-              id: check-prepare-script
-              run: |
-                  if [ -f "./packages/php/${{ github.event.inputs.package }}/tasks/mirror-prepare.sh" ]; then
-                    echo "prepare_script_exists=true" >> $GITHUB_OUTPUT
-                  else
-                    echo "prepare_script_exists=false" >> $GITHUB_OUTPUT
-                  fi
-
-            - name: Cleanup mirror directory
-              if: steps.check-prepare-script.outputs.prepare_script_exists == 'true'
-              run: |
-                  chmod +x "./packages/php/${{ github.event.inputs.package }}/tasks/mirror-prepare.sh"
-                  ./packages/php/${{ github.event.inputs.package }}/tasks/mirror-prepare.sh "mirror-working-dir/woocommerce/${{ github.event.inputs.package }}"
 
             - name: Push to mirror
               uses: Automattic/action-push-to-mirrors@v2.2.2
               with:
                   token: ${{ secrets.API_TOKEN_GITHUB }}
-                  username: matticbot
-                  working-directory: ${{ github.workspace }}/mirror-working-dir
+                  username: woocommercebot
+                  working-directory: ${{ env.mirror_dir }}
                   commit-message: 'Mirror package ${{ github.event.inputs.package }} from WooCommerce'
               timeout-minutes: 5 # Normally should take up to 30 seconds
