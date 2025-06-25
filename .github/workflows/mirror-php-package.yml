@@ -33,7 +33,7 @@ jobs:
               uses: Automattic/action-push-to-mirrors@v2.2.2
               with:
                   token: ${{ secrets.API_TOKEN_GITHUB }}
-                  username: woocommercebot
+                  username: costasovo
                   working-directory: ${{ env.mirror_dir }}
                   commit-message: 'Mirror package ${{ github.event.inputs.package }} from WooCommerce'
               timeout-minutes: 5 # Normally should take up to 30 seconds
