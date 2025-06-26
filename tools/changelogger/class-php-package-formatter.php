@@ -1,4 +1,6 @@
 <?php
+declare( strict_types=1 );
+
 /**
  * Package_Formatter class
  *
@@ -36,7 +38,7 @@ class Php_Package_Formatter extends Formatter implements FormatterPlugin {
 	 *
 	 * @return string Link to the version's release.
 	 */
-	public function getReleaseLink( $version ) {
+	public function getReleaseLink( string $version ): string {
 		// Capture anything past /woocommerce in the current working directory.
 		preg_match( '/\/packages\/php\/(.+)/', getcwd(), $path );
 
