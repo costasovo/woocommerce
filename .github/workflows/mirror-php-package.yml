@@ -24,7 +24,7 @@ jobs:
             - name: Build package for mirroring
               run: |
                   pnpm --filter "${{ github.event.inputs.package }}" build:composer-package
-                  echo "mirror_dir=$( pnpm --filter ${{ github.event.inputs.package }} list --json | jq --compact-output '.[]' | jq --raw-output '( .path + "/build")' )" >> $GITHUB_ENV
+                  echo "mirror_dir=$( pnpm --filter ${{ github.event.inputs.package }} list --json | jq --compact-output '.[]' | jq --raw-output '( .path + "/build")' )" >> $GITHUB_EN
 
             - name: Push to mirror
               uses: Automattic/action-push-to-mirrors@v2.2.2
