@@ -1,7 +1,5 @@
 # WooCommerce Email Editor
 
-YYYY
-
 This folder contains the code for the WooCommerce Email Editor PHP Package.
 
 This package covers functionality for bootstrapping the email editor JS application and code for rendering emails from Gutenberg blocks.
