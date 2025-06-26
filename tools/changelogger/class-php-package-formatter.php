@@ -33,19 +33,19 @@ class Php_Package_Formatter extends Formatter implements FormatterPlugin {
 	/**
 	 * Get Release link given a version number.
 	 *
-	 * @throws \InvalidArgumentException When directory parsing fails.
+	 * @throws \InvalidArgumentException When cannot find the package name.
 	 * @param string $version Release version.
 	 *
 	 * @return string Link to the version's release.
 	 */
 	public function getReleaseLink( string $version ): string {
-		// Capture anything past /woocommerce in the current working directory.
-		preg_match( '/\/packages\/php\/(.+)/', getcwd(), $path );
+		$composer_config = json_decode( file_get_contents( getcwd() . '/composer.json' ), true );
+		$package_name = $composer_config['name'] ?? null;
 
-		if ( ! count( $path ) ) {
-			throw new \InvalidArgumentException( 'Invalid directory.' );
+		if ( ! $package_name ) {
+			throw new \InvalidArgumentException( "Can't find package name in composer.json." );
 		}
 
-		return 'https://github.com/woocommerce/' .  $path[1] . '/releases/tag/' . $version;
+		return 'https://github.com/' .  $package_name . '/releases/tag/' . $version;
 	}
 }
